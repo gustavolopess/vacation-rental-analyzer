@@ -25,15 +25,22 @@ export class AirbnbCrawlerProvider implements IAirbnbCrawlerProvider {
   private async getNextUnavailableCalendarDaysFromPage(
     page: Page
   ): Promise<Moment[]> {
-    const nextUnavailableCalendarDays = await page.evaluate(() => {
-      const elements = document.querySelectorAll(this.unavailableDayClassName);
-      const nextCalendarDays = Array.from(elements, (e) =>
-        e.getAttribute("data-testid")
-      );
-      return nextCalendarDays;
-    });
+    const nextUnavailableCalendarDays = await page.$$eval(
+      this.unavailableDayClassName,
+      (elts) => {
+        return elts.reduce((listOfDays, currentElement) => {
+          const currentDay = currentElement.getAttribute("data-testid");
 
-    const nextUnavailableDays = (nextUnavailableCalendarDays as string[])
+          if (currentDay != null) {
+            return listOfDays.concat(currentDay);
+          }
+
+          return listOfDays;
+        }, [] as string[]);
+      }
+    );
+
+    const nextUnavailableDays = nextUnavailableCalendarDays
       .map(this.calendarDayToMoment)
       .filter(this.isDateSameOrAfterToday);
 
