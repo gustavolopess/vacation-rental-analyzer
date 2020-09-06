@@ -1,0 +1,17 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+    name: occupation-crawler-job
+spec:
+    schedule: "1 */1 * * *"
+    jobTemplate:
+        spec:
+            template:
+                spec:
+                    containers:
+                        - name: occupation-crawler-job
+                          image: gustavolopess/vacation-rental-analyzer:latest
+                          args:
+                            - npm
+                            - start
+                    restartPolicy: OnFailure

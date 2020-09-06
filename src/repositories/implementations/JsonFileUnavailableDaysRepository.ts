@@ -7,7 +7,10 @@ export class JsonFileUnavailableDaysRepository
   constructor(private readonly jsonFilePath: string) {}
 
   async loadUnavailableDays(): Promise<UnavailableDaysByRoomAndMonth> {
-    if (fs.existsSync(this.jsonFilePath)) {
+    if (
+      fs.existsSync(this.jsonFilePath) &&
+      fs.statSync(this.jsonFilePath).size > 0
+    ) {
       const file = fs.readFileSync(this.jsonFilePath, "utf-8");
       return new UnavailableDaysByRoomAndMonth(JSON.parse(file));
     }
