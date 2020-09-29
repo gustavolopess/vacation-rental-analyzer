@@ -6,10 +6,10 @@ services:
     container_name: prometheus
     ports:
     - 9191:9191
-    volumes:
-    - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
     - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./tmp/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
     - occupation-crawler
   occupation-crawler:
@@ -17,10 +17,31 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-    - 8080:8080
+    - 8181:8181
     volumes:
       - ./dist:/app/dist
       - ./src:/app/src
       - ./package-lock.json:/app/package-lock.json:ro
       - ./package.json:/app/package.json:ro
       - ./unavailable_days.json:/app/unavailable_days.json
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - '9101:9101'
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8080:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+    - redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+    - 6379:6379
