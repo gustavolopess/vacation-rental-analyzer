@@ -1,0 +1,11 @@
+global:
+  scrape_interval:     60s # default
+  evaluation_interval: 60s # default
+  scrape_timeout: 10s # default
+
+scrape_configs:
+- job_name: occupation-crawler
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - occupation-crawler:8080
