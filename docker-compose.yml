@@ -1,15 +1,40 @@
 version: "3"
 
 services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+    - 9091:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+    - ./tmp/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+    - occupation-crawler
   occupation-crawler:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+    - 8082:8080
     volumes:
       - ./dist:/app/dist
       - ./src:/app/src
       - ./package-lock.json:/app/package-lock.json:ro
       - ./package.json:/app/package.json:ro
       - ./unavailable_days.json:/app/unavailable_days.json
-
-
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - '9101:9100'
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8081:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
