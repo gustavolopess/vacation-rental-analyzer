@@ -9,7 +9,7 @@ services:
     command:
     - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-    - ./tmp/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - ./etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
     - occupation-crawler
   occupation-crawler:
@@ -43,10 +43,10 @@ services:
     container_name: grafana
     ports:
         - '3000:3000'
-    user: "$UID:$GID"
+    user: "$UID:$GID" # It's blank but it breaks without it
     volumes:
-        - './tmp/grafana.ini:/etc/grafana/grafana.ini'
-        - './tmp/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
+        - './etc/grafana/grafana.ini:/etc/grafana/grafana.ini'
+        - './etc/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
         - 'grafana-storage:/var/lib/grafana'
     links:
       - prometheus
