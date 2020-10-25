@@ -5,7 +5,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
-    - 9091:9090
+    - 9090:9090
     command:
     - --config.file=/etc/prometheus/prometheus.yml
     volumes:
@@ -38,3 +38,17 @@ services:
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+        - '3000:3000'
+    user: "$UID:$GID"
+    volumes:
+        - './tmp/grafana.ini:/etc/grafana/grafana.ini'
+        - './tmp/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml'
+        - 'grafana-storage:/var/lib/grafana'
+    links:
+      - prometheus
+volumes:
+  grafana-storage:
